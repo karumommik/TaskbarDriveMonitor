@@ -1,4 +1,4 @@
-# Taskbar Drive Monitor (v1.0.4)
+# Taskbar Drive Monitor (v1.0.5)
 
 A lightweight, stable, and convenient Windows 11 utility that automatically places itself on the taskbar, displaying selected drives' free capacity (both as percentages and in gigabytes) along with dynamic, color-coded progress bars.
 
@@ -45,6 +45,9 @@ To ensure 24/7 stability and prevent being flagged by antivirus software, this u
 ---
 
 ## 4. Release History & Changelog
+
+### v1.0.5
+* Added a new modern application logo and updated the system tray icon to use it.
 
 ### v1.0.4 (2026-07-09)
 This release introduces Microsoft Store packaging support (MSIX), while preserving the standalone portable releases.
