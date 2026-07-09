@@ -44,13 +44,7 @@ To ensure 24/7 stability and prevent being flagged by antivirus software, this u
 ## 4. Release History & Changelog
 
 ### v1.0.4 (2026-07-09)
-* **Manifest Injection Fix:** Fixed a regex error in the release workflow that accidentally replaced the `MinVersion` field of target devices with the application version, ensuring correct Windows target limits are packaged.
-
-### v1.0.3 (2026-07-09)
-* **Store MinVersion Alignment:** Adjusted minimum Windows target version to `10.0.19041.0` (Windows 10, version 2004) to satisfy Microsoft Partner Center validation rules.
-* **Manifest Diagnostics:** Integrated manifest logging steps inside the packaging workflow to print generated XML parameters.
-
-### v1.0.2 (2026-07-09)
+This release introduces Microsoft Store packaging support (MSIX), while preserving the standalone portable releases.
 * **Microsoft Store MSIX Support:** Integrated package manifest and asset requirements. The build pipeline now outputs a single `.msixbundle` supporting both `x64` and `ARM64` for Microsoft Store deployment.
 * **Portable Builds Preserved:** The standalone portable `.zip` releases continue to be built and published identically to previous versions.
 
