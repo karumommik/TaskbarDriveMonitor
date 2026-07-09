@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Derive version from tag
+        id: ver
+        shell: bash
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Publish, Zip and Checksum
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory -Force dist | Out-Null
+          
+          foreach ($rid in @('win-x64', 'win-arm64')) {
+            Write-Host "== Publishing Self-Contained $rid =="
+            
+            # Publish self-contained single-file build
+            dotnet publish TaskbarDriveMonitor.csproj -c Release -r $rid `
+              --self-contained true -p:PublishSingleFile=true -p:PublishReadyToRun=true `
+              -p:Version=$env:VERSION -o "publish/$rid"
+            if ($LASTEXITCODE -ne 0) { throw "Publish failed for $rid" }
+            
+            $zipName = "TaskbarDriveMonitor-$env:VERSION-$rid.zip"
+            Compress-Archive -Path "publish/$rid/TaskbarDriveMonitor.exe" -DestinationPath "dist/$zipName" -Force
+            
+            # Generate SHA256 checksum for the zip file
+            $hash = (Get-FileHash "dist/$zipName" -Algorithm SHA256).Hash.ToLower()
+            "$hash  $zipName" | Out-File "dist/$zipName.sha256" -Encoding ascii
+            Write-Host "$zipName -> $hash"
+          }
+          Get-ChildItem dist | Select-Object Name, Length | Format-Table -AutoSize
+
+      - name: Write release notes
+        shell: bash
+        env:
+          VERSION: ${{ steps.ver.outputs.version }}
+        run: |
+          cat > notes.md <<EOF
+          ### Taskbar Drive Monitor v${VERSION}
+
+          This is a lightweight, clean disk capacity widget running on your Windows Taskbar, built under **.NET 10.0**.
+
+          * **Self-Contained & Zero Dependencies:** The download includes everything required to run the utility. No external .NET runtimes needed.
+          * **DPI Scaling Support:** The interface scales dynamically to look sharp on high-DPI and high-resolution monitors.
+          * **Explorer Integration:** Click on any drive widget to immediately open that drive in File Explorer.
+          * **Dynamic Progress Bars:** Color-coded usage indicators (Green < 70%, Orange 70-90%, Red > 90%) update in the background with zero CPU overhead.
+
+          ---
+          *Each download ships with a matching \`.sha256\` file. Verify file integrity in PowerShell with:*
+
+          \`\`\`powershell
+          (Get-FileHash TaskbarDriveMonitor-${VERSION}-win-x64.zip -Algorithm SHA256).Hash
+          \`\`\`
+          EOF
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        shell: bash
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; leaving it untouched."
+            exit 0
+          fi
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes-file notes.md \
+            dist/*.zip dist/*.sha256

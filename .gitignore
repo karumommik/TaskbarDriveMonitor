@@ -1,0 +1,16 @@
+# Logs
+*log.txt
+crashlog.txt
+
+# Binaries
+*.exe
+*.dll
+*.pdb
+bin/
+obj/
+build/
+dist/
+publish/
+
+# Local settings
+settings.txt
