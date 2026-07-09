@@ -2,6 +2,9 @@
 
 A lightweight, stable, and convenient Windows 11 utility that automatically places itself on the taskbar, displaying selected drives' free capacity (both as percentages and in gigabytes) along with dynamic, color-coded progress bars.
 
+### Preview
+![Taskbar Widget](IMG_1.png)
+
 ---
 
 ## 1. Key Features
