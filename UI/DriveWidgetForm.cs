@@ -128,22 +128,8 @@ namespace TaskbarDriveMonitor.UI
             notifyIcon = new NotifyIcon();
             try
             {
-                Log("Creating tray icon bitmap");
-                // Create a dynamic nice harddrive-like icon
-                Bitmap bmp = new Bitmap(16, 16);
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    g.SmoothingMode = SmoothingMode.AntiAlias;
-                    g.FillRectangle(Brushes.Gray, 2, 2, 12, 12);
-                    g.FillEllipse(Brushes.LightGray, 4, 4, 3, 3);
-                    g.FillEllipse(Brushes.LightGray, 9, 4, 3, 3);
-                    using (Pen p = new Pen(Color.White, 1))
-                    {
-                        g.DrawRectangle(p, 2, 2, 12, 12);
-                        g.DrawLine(p, 2, 10, 14, 10);
-                    }
-                }
-                notifyIcon.Icon = Icon.FromHandle(bmp.GetHicon());
+                Log("Loading application icon for tray");
+                notifyIcon.Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
             }
             catch (Exception ex)
             {
