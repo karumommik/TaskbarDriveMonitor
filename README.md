@@ -1,4 +1,4 @@
-# TaskbarDriveMonitor (v1.0.1)
+# TaskbarDriveMonitor (v1.0.2)
 
 A lightweight, clean disk capacity widget running on your Windows Taskbar. It sits next to your system tray (or in custom positions) and displays selected drives' free space (percentage and GB) along with dynamic, color-coded progress bars.
 
@@ -68,6 +68,10 @@ To publish a new release:
 ---
 
 ## Release History & Changelog
+
+### v1.0.2 (2026-07-09)
+* **Microsoft Store MSIX Support:** Integrated package manifest and asset requirements. The build pipeline now outputs a single `.msixbundle` supporting both `x64` and `ARM64` for Microsoft Store deployment.
+* **Portable Builds Preserved:** The standalone portable `.zip` releases continue to be built and published identically to previous versions.
 
 ### v1.0.1 (2026-07-09)
 * Optimized File Explorer opening speed by using ShellExecute instead of spawning a new `explorer.exe` process from disk.
