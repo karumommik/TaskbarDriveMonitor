@@ -140,7 +140,11 @@ namespace TaskbarDriveMonitor.Controls
             {
                 try
                 {
-                    System.Diagnostics.Process.Start("explorer.exe", driveName);
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = driveName,
+                        UseShellExecute = true
+                    });
                 }
                 catch { }
             }
