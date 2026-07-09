@@ -1,4 +1,4 @@
-# Taskbar Drive Monitor (v1.0.2)
+# Taskbar Drive Monitor (v1.0.3)
 
 A lightweight, stable, and convenient Windows 11 utility that automatically places itself on the taskbar, displaying selected drives' free capacity (both as percentages and in gigabytes) along with dynamic, color-coded progress bars.
 
@@ -42,6 +42,10 @@ To ensure 24/7 stability and prevent being flagged by antivirus software, this u
 ---
 
 ## 4. Release History & Changelog
+
+### v1.0.3 (2026-07-09)
+* **Store MinVersion Alignment:** Adjusted minimum Windows target version to `10.0.19041.0` (Windows 10, version 2004) to satisfy Microsoft Partner Center validation rules.
+* **Manifest Diagnostics:** Integrated manifest logging steps inside the packaging workflow to print generated XML parameters.
 
 ### v1.0.2 (2026-07-09)
 * **Microsoft Store MSIX Support:** Integrated package manifest and asset requirements. The build pipeline now outputs a single `.msixbundle` supporting both `x64` and `ARM64` for Microsoft Store deployment.
