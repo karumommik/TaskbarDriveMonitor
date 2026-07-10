@@ -1,4 +1,4 @@
-# Taskbar Drive Monitor (v1.0.5)
+# Taskbar Drive Monitor (v1.0.6)
 
 A lightweight, stable, and convenient Windows 11 utility that automatically places itself on the taskbar, displaying selected drives' free capacity (both as percentages and in gigabytes) along with dynamic, color-coded progress bars.
 
@@ -45,6 +45,10 @@ To ensure 24/7 stability and prevent being flagged by antivirus software, this u
 ---
 
 ## 4. Release History & Changelog
+
+### v1.0.6
+* **MSIX Store Compatibility & Portability:** The app now dynamically checks if it is packaged via `Win32.IsPackaged()`. If running as an MSIX Store app, logs and settings are safely stored in `%LOCALAPPDATA%`. If running as a standalone `.exe`, it preserves perfect 100% portable behavior by storing data alongside the executable.
+* **Store Assets Update:** Generated correctly sized MS Store icons from `app.ico` and removed dummy placeholder images in the `Assets` folder to comply with Store UI guidelines.
 
 ### v1.0.5
 * Added a new modern application logo and updated the system tray icon to use it.

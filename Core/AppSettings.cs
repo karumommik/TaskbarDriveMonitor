@@ -17,6 +17,12 @@ namespace TaskbarDriveMonitor.Core
 
         private static string GetFilePath()
         {
+            if (TaskbarDriveMonitor.Native.Win32.IsPackaged())
+            {
+                string dir = System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskbarDriveMonitor");
+                System.IO.Directory.CreateDirectory(dir);
+                return System.IO.Path.Combine(dir, "settings.txt");
+            }
             return System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings.txt");
         }
 

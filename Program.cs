@@ -10,8 +10,13 @@ namespace TaskbarDriveMonitor
         [STAThread]
         static void Main()
         {
-            string logPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
-            string crashPath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "crash.log");
+            string dir = TaskbarDriveMonitor.Native.Win32.IsPackaged() 
+                ? System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskbarDriveMonitor") 
+                : AppDomain.CurrentDomain.BaseDirectory;
+            if (TaskbarDriveMonitor.Native.Win32.IsPackaged()) System.IO.Directory.CreateDirectory(dir);
+            
+            string logPath = System.IO.Path.Combine(dir, "debug_log.txt");
+            string crashPath = System.IO.Path.Combine(dir, "crash.log");
             
             try 
             {

@@ -53,7 +53,9 @@ namespace TaskbarDriveMonitor.UI
         {
             try
             {
-                string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
+                string logPath = Native.Win32.IsPackaged() 
+                    ? Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "TaskbarDriveMonitor", "debug_log.txt") 
+                    : Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "debug_log.txt");
                 File.AppendAllText(logPath, $"[Widget] {msg}\r\n");
             }
             catch { }
