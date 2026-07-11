@@ -173,24 +173,31 @@ namespace TaskbarDriveMonitor.UI
                 notifyIcon.Visible = false;
                 Application.Exit();
             });
-            contextMenu.Items.Add(exitItem);
-
-            var trayHost = new Form {
-                StartPosition = FormStartPosition.Manual,
-                FormBorderStyle = FormBorderStyle.None,
-                ShowInTaskbar = false,
-                Size = new Size(0, 0),
-                Location = new Point(-32000, -32000)
-            };
-            trayHost.Show();
-
             notifyIcon.MouseClick += (s, e) => {
                 if (e.Button == MouseButtons.Right) {
-                    Native.Win32.SetForegroundWindow(trayHost.Handle);
-                    contextMenu.Show(trayHost, trayHost.PointToClient(Cursor.Position));
-                    Native.Win32.SetForegroundWindow(contextMenu.Handle);
+                    var dummy = new Form {
+                        FormBorderStyle = FormBorderStyle.None,
+                        ShowInTaskbar = false,
+                        StartPosition = FormStartPosition.Manual,
+                        Size = new Size(1, 1),
+                        Opacity = 0.01
+                    };
+                    Point pos = Cursor.Position;
+                    IntPtr dummyHandle = dummy.Handle;
+                    Native.Win32.SetWindowPos(dummyHandle, IntPtr.Zero, pos.X, pos.Y, 1, 1, 0x0004 | 0x0010 | 0x0040);
+                    Native.Win32.SetForegroundWindow(dummyHandle);
+                    
+                    ToolStripDropDownClosedEventHandler? handler = null;
+                    handler = (sender, args) => {
+                        if (handler != null) contextMenu.Closed -= handler;
+                        dummy.Close();
+                        dummy.Dispose();
+                    };
+                    contextMenu.Closed += handler;
+                    contextMenu.Show(dummy, new Point(0, 0));
                 }
             };
+
             notifyIcon.DoubleClick += (s, e) => {
                 if (((MouseEventArgs)e).Button == MouseButtons.Left) {
                     RefreshDriveDataNow();
@@ -392,14 +399,48 @@ namespace TaskbarDriveMonitor.UI
                 targetTop += settings.OffsetY;
             }
 
+            // Collision detection with AudioSwitcher
+            IntPtr audioHwnd = Win32.FindWindow(null, "TaskbarAudioSwitcherWidget");
+            if (audioHwnd != IntPtr.Zero)
+            {
+                Win32.RECT rectAudio;
+                if (Win32.GetWindowRect(audioHwnd, out rectAudio))
+                {
+                    int audioLeft = (int)(rectAudio.Left / scale);
+                    int audioTop = (int)(rectAudio.Top / scale);
+                    if (Math.Abs(audioTop - targetTop) < 50)
+                    {
+                        int proposedRight = targetLeft + calculatedWidth;
+                        if (proposedRight > audioLeft - (int)(8 * scale))
+                        {
+                            targetLeft = audioLeft - calculatedWidth - (int)(16 * scale);
+                        }
+                    }
+                }
+            }
+
             // Update bounds
             if (this.Left != targetLeft || this.Top != targetTop || this.Width != calculatedWidth)
             {
                 this.Bounds = new Rectangle(targetLeft, targetTop, calculatedWidth, this.Height);
             }
 
-            // Topmost Z-order
-            Win32.SetWindowPos(this.Handle, Win32.HWND_TOPMOST, 0, 0, 0, 0, Win32.SWP_NOMOVE | Win32.SWP_NOSIZE | Win32.SWP_NOACTIVATE | Win32.SWP_SHOWWINDOW);
+            // Dynamic Z-order based on fullscreen apps
+            Screen? gameScreen;
+            uint gameProcId;
+            bool isFullscreenActive = IsForegroundWindowFullscreen(out gameScreen, out gameProcId);
+            
+            IntPtr topmostFlag = Win32.HWND_TOPMOST;
+            if (isFullscreenActive && gameScreen != null)
+            {
+                // If a fullscreen game is active on the same screen we are displaying, go under it
+                if (scr != null && gameScreen.DeviceName == scr.DeviceName)
+                {
+                    topmostFlag = Win32.HWND_NOTOPMOST;
+                }
+            }
+
+            Win32.SetWindowPos(this.Handle, topmostFlag, 0, 0, 0, 0, Win32.SWP_NOMOVE | Win32.SWP_NOSIZE | Win32.SWP_NOACTIVATE | Win32.SWP_SHOWWINDOW);
         }
 
         private void RefreshDriveDataNow()
@@ -563,6 +604,56 @@ namespace TaskbarDriveMonitor.UI
                 }
             }
             catch { }
+        }
+
+        private bool IsForegroundWindowFullscreen(out Screen? onScreen, out uint processId)
+        {
+            onScreen = null;
+            processId = 0;
+            IntPtr hwnd = Native.Win32.GetForegroundWindow();
+            if (hwnd == IntPtr.Zero || hwnd == this.Handle) return false;
+
+            // Skip desktop and taskbar windows
+            string className = Native.Win32.GetClassNameOfWindow(hwnd);
+            if (className == "Shell_TrayWnd" || className == "WorkerW" || className == "Progman" || className == "CabinetWClass")
+            {
+                return false;
+            }
+
+            Native.Win32.RECT rect;
+            if (Native.Win32.GetWindowRect(hwnd, out rect))
+            {
+                // Find which screen this window is on
+                foreach (var scr in Screen.AllScreens)
+                {
+                    // Check if it covers the entire screen bounds with a small tolerance
+                    if (rect.Left <= scr.Bounds.Left + 4 &&
+                        rect.Top <= scr.Bounds.Top + 4 &&
+                        rect.Right >= scr.Bounds.Right - 4 &&
+                        rect.Bottom >= scr.Bounds.Bottom - 4)
+                    {
+                        onScreen = scr;
+                        Native.Win32.GetWindowThreadProcessId(hwnd, out processId);
+                        try
+                        {
+                            using (var proc = System.Diagnostics.Process.GetProcessById((int)processId))
+                            {
+                                string name = proc.ProcessName.ToLower();
+                                if (name == "lockapp" || name == "logonui" || name == "explorer" || name == "dwm" || 
+                                    name == "shellexperiencehost" || name == "searchhost" || name == "startmenuexperiencehost" ||
+                                    name == "chrome" || name == "firefox" || name == "msedge" || name == "opera" || 
+                                    name == "brave" || name == "vivaldi" || name == "discord" || name == "teams" || name == "zoom")
+                                {
+                                    return false;
+                                }
+                            }
+                        }
+                        catch { }
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     }
 }

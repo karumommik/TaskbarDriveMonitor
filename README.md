@@ -46,7 +46,11 @@ To ensure 24/7 stability and prevent being flagged by antivirus software, this u
 
 ## 4. Release History & Changelog
 
-### v1.0.7 (Current Version)
+### v1.0.8 (Current Version)
+* **Dynamic Fullscreen Game Hiding:** Integrated automated fullscreen application detection. The widget now monitors if a fullscreen game or application launches on its screen and dynamically drops its Z-order to hide under it, preventing it from overlaying game screens.
+* **Secondary Monitor Context Menu Fix:** Fixed a DPI scaling/monitor boundary issue that caused right-clicking on the tray icon to fail when the widget was directed to a secondary display. It now positions a dummy window natively on the correct screen to ensure the menu renders exactly at the cursor coordinates.
+
+### v1.0.7
 * **High-DPI / Scaling UI Fixes:** Added explicit DPI scaling multiplication to custom drawn GDI+ fonts in `DriveIndicatorControl` to prevent them from becoming physically too small at 125%+ scaling. Expanded the base block width to prevent text truncation at larger font sizes.
 * **Secondary Monitor Taskbar Menu Fix:** Completely refactored the tray icon context menu rendering behavior. The menu now spawns via a hidden background process anchored natively to the system shell, which guarantees the context menu always appears exactly at the cursor position on multi-monitor setups without taskbar flashing or focus loss issues.
 * **Clock Overlay Fix:** Increased the fallback offset padding used when calculating layout dimensions for secondary monitor taskbars, fully preventing the widget from covering the Windows 11 secondary clock overlay.
