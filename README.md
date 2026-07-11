@@ -1,4 +1,4 @@
-# Taskbar Drive Monitor (v1.0.6)
+# Taskbar Drive Monitor (v1.0.7)
 
 A lightweight, stable, and convenient Windows 11 utility that automatically places itself on the taskbar, displaying selected drives' free capacity (both as percentages and in gigabytes) along with dynamic, color-coded progress bars.
 
@@ -45,6 +45,12 @@ To ensure 24/7 stability and prevent being flagged by antivirus software, this u
 ---
 
 ## 4. Release History & Changelog
+
+### v1.0.7 (Current Version)
+* **High-DPI / Scaling UI Fixes:** Added explicit DPI scaling multiplication to custom drawn GDI+ fonts in `DriveIndicatorControl` to prevent them from becoming physically too small at 125%+ scaling. Expanded the base block width to prevent text truncation at larger font sizes.
+* **Secondary Monitor Taskbar Menu Fix:** Completely refactored the tray icon context menu rendering behavior. The menu now spawns via a hidden background process anchored natively to the system shell, which guarantees the context menu always appears exactly at the cursor position on multi-monitor setups without taskbar flashing or focus loss issues.
+* **Clock Overlay Fix:** Increased the fallback offset padding used when calculating layout dimensions for secondary monitor taskbars, fully preventing the widget from covering the Windows 11 secondary clock overlay.
+* **Settings Dialog Location:** Hardcoded the settings menu to permanently calculate its screen boundaries using `Screen.PrimaryScreen`, forcing the layout to uniformly generate perfectly centered on the primary display regardless of the user's mouse position during invocation.
 
 ### v1.0.6
 * **MSIX Store Compatibility & Portability:** The app now dynamically checks if it is packaged via `Win32.IsPackaged()`. If running as an MSIX Store app, logs and settings are safely stored in `%LOCALAPPDATA%`. If running as a standalone `.exe`, it preserves perfect 100% portable behavior by storing data alongside the executable.

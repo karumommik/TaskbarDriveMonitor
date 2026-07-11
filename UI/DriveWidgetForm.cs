@@ -175,8 +175,27 @@ namespace TaskbarDriveMonitor.UI
             });
             contextMenu.Items.Add(exitItem);
 
-            notifyIcon.ContextMenuStrip = contextMenu;
-            notifyIcon.DoubleClick += (s, e) => RefreshDriveDataNow();
+            var trayHost = new Form {
+                StartPosition = FormStartPosition.Manual,
+                FormBorderStyle = FormBorderStyle.None,
+                ShowInTaskbar = false,
+                Size = new Size(0, 0),
+                Location = new Point(-32000, -32000)
+            };
+            trayHost.Show();
+
+            notifyIcon.MouseClick += (s, e) => {
+                if (e.Button == MouseButtons.Right) {
+                    Native.Win32.SetForegroundWindow(trayHost.Handle);
+                    contextMenu.Show(trayHost, trayHost.PointToClient(Cursor.Position));
+                    Native.Win32.SetForegroundWindow(contextMenu.Handle);
+                }
+            };
+            notifyIcon.DoubleClick += (s, e) => {
+                if (((MouseEventArgs)e).Button == MouseButtons.Left) {
+                    RefreshDriveDataNow();
+                }
+            };
         }
 
         private void RecreateDriveControls()
@@ -224,7 +243,7 @@ namespace TaskbarDriveMonitor.UI
             foreach (var ctrl in driveControls)
             {
                 ctrl.Height = h;
-                ctrl.Width = (int)(110 * scale);
+                ctrl.Width = (int)(118 * scale);
                 ctrl.Location = new Point(currentX, 0);
                 currentX += ctrl.Width + margin;
             }
@@ -368,7 +387,7 @@ namespace TaskbarDriveMonitor.UI
                 }
                 else
                 {
-                    targetLeft = bounds.Right - calculatedWidth - (int)(16 * scale) + settings.OffsetX;
+                    targetLeft = bounds.Right - calculatedWidth - (int)(200 * scale) + settings.OffsetX;
                 }
                 targetTop += settings.OffsetY;
             }

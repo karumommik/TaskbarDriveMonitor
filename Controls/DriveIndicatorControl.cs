@@ -176,8 +176,8 @@ namespace TaskbarDriveMonitor.Controls
             Color textMainColor = isDarkMode ? Color.FromArgb(240, 240, 240) : Color.FromArgb(30, 30, 30);
             Color textSubColor = isDarkMode ? Color.FromArgb(170, 170, 170) : Color.FromArgb(100, 100, 100);
 
-            using (var fontMain = new Font("Segoe UI", 9f, FontStyle.Bold))
-            using (var fontSub = new Font("Segoe UI", 7.5f, FontStyle.Regular))
+            using (var fontMain = new Font("Segoe UI", 9f * scale, FontStyle.Bold))
+            using (var fontSub = new Font("Segoe UI", 7.5f * scale, FontStyle.Regular))
             using (var brushMain = new SolidBrush(textMainColor))
             using (var brushSub = new SolidBrush(textSubColor))
             {
