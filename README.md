@@ -123,3 +123,21 @@ To publish a new release:
    git push origin v1.0.2
    ```
 4. The GitHub Action runner will automatically compile `win-x64` and `win-arm64` ZIP packages, generate `.sha256` integrity files, build the Microsoft Store `.msixbundle`, write release notes, and create the official GitHub release.
+
+---
+
+## 8. Security, Privacy & System Access Audit (SEC Compliance)
+
+This section provides an enterprise security and compliance breakdown for IT Security Officers (CISO / SEC), System Administrators, and ISO 27001 compliance auditors.
+
+| Audit Category | Security Implementation Details | Risk Assessment |
+| :--- | :--- | :---: |
+| **Execution Privileges** | Runs strictly in **User Mode (Non-Elevated)**. Does **NOT** require Administrator/UAC elevation. | 🟢 **Zero Risk** |
+| **System Isolation** | Standalone Win32 overlay process. Reads standard Windows drive volume metadata without injecting DLLs into `explorer.exe`. | 🟢 **Zero Risk** |
+| **Input & Focus Safety** | Utilizes `WS_EX_NOACTIVATE` & `WS_EX_TOOLWINDOW` flags. Cannot intercept keystrokes or keylog active apps. | 🟢 **Zero Risk** |
+| **Network & Telemetry** | **0% Network Traffic**. Zero background telemetry, analytics, tracking, or remote server calls. | 🟢 **Zero Risk** |
+| **Data Storage at Rest** | Settings stored locally in `%LOCALAPPDATA%\TaskbarDriveMonitor\` as plain text XML/JSON. | 🟢 **Zero Risk** |
+| **Registry Footprint** | Limited strictly to User-Scope `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`. Does **NOT** modify `HKLM`. | 🟢 **Zero Risk** |
+| **Disk Polling Safety** | Low-frequency drive queries run on background thread (1 min interval). Zero raw disk block reading or low-level driver access. | 🟢 **Zero Risk** |
+| **Deserialization Safety** | Uses standard XML/JSON serialization. Immune to `BinaryFormatter` arbitrary code execution exploits. | 🟢 **Zero Risk** |
+
